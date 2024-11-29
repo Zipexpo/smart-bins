@@ -54,7 +54,7 @@ var model = undefined;
 // to get everything needed to run.
 // Note: cocoSsd is an external object loaded from our index.html
 // script tag import so ignore any warning in Glitch.
-cocoSsd.load().then(function (loadedModel) {
+yolo_model.load().then(function (loadedModel) {
   model = loadedModel;
   // Show demo section now model is ready to use.
   demosSection.classList.remove("invisible");
@@ -64,7 +64,7 @@ var children = [];
 
 function predictWebcam() {
   // Now let's start classifying a frame in the stream.
-  model.detect(video).then(function (predictions) {
+  model.detectVideo(video).then(function (predictions) {
     // Remove any highlighting we did previous frame.
     for (let i = 0; i < children.length; i++) {
       liveView.removeChild(children[i]);
