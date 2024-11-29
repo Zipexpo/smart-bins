@@ -20,10 +20,28 @@
         classification! When ready click "enable webcam" below and accept access
         to the webcam when the browser asks (check the top left of your window)
       </p>
-
-      <div id="liveView" class="camView">
-        <button id="webcamButton">Enable Webcam</button>
-        <video id="webcam" autoplay muted width="640" height="480"></video>
+      <div class="mainView">
+        <div id="liveView" class="camView">
+          <button id="webcamButton">Enable Webcam</button>
+          <button id="objectButton">Object detected button</button>
+          <video id="webcam" autoplay muted width="640" height="480"></video>
+        </div>
+        <div class="binsHolder">
+          <div class="binHolder">
+            <span class="trash" id="organicBin">
+              <span></span>
+              <i></i>
+            </span>
+            <span class="title">Organic Watse </span>
+          </div>
+          <div class="binHolder">
+            <span class="trash blue" id="inorganicBin">
+              <span></span>
+              <i></i>
+            </span>
+            <span class="title">Inorganic Watse </span>
+          </div>
+        </div>
       </div>
     </section>
 

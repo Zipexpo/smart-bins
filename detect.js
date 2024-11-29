@@ -116,15 +116,6 @@ yolo_model.load = () =>
           const scores_data = scores.gather(nms, 0).dataSync(); // indexing scores by nms index
           const classes_data = classes.gather(nms, 0).dataSync(); // indexing classes by nms index
 
-          // renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [
-          //   xRatio,
-          //   yRatio,
-          // ]); // render boxes
-          tf.dispose([res, transRes, boxes, scores, classes, nms]); // clear memory
-
-          callback();
-
-          tf.engine().endScope(); // end of scoping
           const prediction = [];
           for (let i = 0; i < classes_data.length; i++) {
             let [y1, x1, y2, x2] = boxes_data.slice(i * 4, (i + 1) * 4);
@@ -140,6 +131,11 @@ yolo_model.load = () =>
               score: scores_data[i],
             });
           }
+          tf.dispose([res, transRes, boxes, scores, classes, nms]); // clear memory
+
+          callback();
+
+          tf.engine().endScope(); // end of scoping
           return prediction;
         };
 

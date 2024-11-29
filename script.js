@@ -2,6 +2,7 @@ const video = document.getElementById("webcam");
 const liveView = document.getElementById("liveView");
 const demosSection = document.getElementById("demos");
 const enableWebcamButton = document.getElementById("webcamButton");
+const objectDetectButton = document.getElementById("objectButton");
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
@@ -13,9 +14,15 @@ function getUserMediaSupported() {
 // define in the next step.
 if (getUserMediaSupported()) {
   enableWebcamButton.addEventListener("click", enableCam);
+  objectDetectButton.addEventListener("click", captureCam);
 } else {
   console.warn("getUserMedia() is not supported by your browser");
 }
+
+// getUsermedia parameters to force video but not audio.
+const constraints = {
+  video: true,
+};
 
 // Enable the live webcam view and start classification.
 function enableCam(event) {
@@ -27,20 +34,38 @@ function enableCam(event) {
   // Hide the button once clicked.
   event.target.classList.add("removed");
 
-  // getUsermedia parameters to force video but not audio.
-  const constraints = {
-    video: true,
-  };
-
-  // Activate the webcam stream.
   navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
     video.srcObject = stream;
-    video.addEventListener("loadeddata", predictWebcam);
   });
 }
 
+function captureCam() {
+  if (!model) {
+    return;
+  }
+  video.play();
+  organicBin.classList.remove("open");
+  inorganicBin.classList.remove("open");
+
+  // Process frames for 1 second.
+  let processing = true;
+  setTimeout(() => {
+    processing = false;
+  }, 1000);
+  function processFrame() {
+    predictWebcam(() => {
+      if (processing) {
+        window.requestAnimationFrame(processFrame);
+      } else {
+        video.pause();
+      }
+    });
+  }
+  processFrame();
+}
+
 // Placeholder function for next step.
-function predictWebcam() {}
+function predictWebcam(callback = () => {}) {}
 
 // Pretend model has loaded so we can try out the webcam code.
 var model = true;
@@ -62,7 +87,14 @@ yolo_model.load().then(function (loadedModel) {
 
 var children = [];
 
-function predictWebcam() {
+function removehighlight() {
+  for (let i = 0; i < children.length; i++) {
+    liveView.removeChild(children[i]);
+  }
+  children.splice(0);
+}
+
+function predictWebcam(callback = () => {}) {
   // Now let's start classifying a frame in the stream.
   model.detectVideo(video).then(function (predictions) {
     // Remove any highlighting we did previous frame.
@@ -109,10 +141,11 @@ function predictWebcam() {
         liveView.appendChild(p);
         children.push(highlighter);
         children.push(p);
+        if (predictions[n].class === "organic")
+          organicBin.classList.add("open");
+        else inorganicBin.classList.add("open");
       }
     }
-
-    // Call this function again to keep predicting when the browser is ready.
-    window.requestAnimationFrame(predictWebcam);
+    callback();
   });
 }
